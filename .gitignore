@@ -31,3 +31,7 @@ docs/_pr-comment.md
 
 # instructor (should never be in template)
 instructor/
+
+# Playwright MCP snapshots / console logs (ephemeral)
+.playwright-mcp/
+docs/_pr-diff-*.txt

@@ -1,11 +1,12 @@
 # ตรวจสัญญา FE ↔ BE — ฟอร์ม Contact/Guestbook vs API stub
 
-> ผู้ตรวจ: OpenCode (backend) · วันที่: 2026-09-25 · **ไม่แก้ไฟล์ใดใน `src/`** — รายงานอย่างเดียว
-> ขอบเขต: `docs/DECISIONS.md` (D5, D6, D9, D11) · `src/pages/contact.astro` · `src/pages/guestbook.astro` · `src/pages/api/contact.ts` · `src/pages/api/guestbook.ts` · `src/pages/api/interests.ts` · `src/lib/db.ts` (stub)
+> ผู้ตรวจ: OpenCode (backend) · วันที่: 2026-09-25 · ตรวจก่อน implement Lab 05
+> ขอบเขต: `docs/DECISIONS.md` (D5, D6, D9, D11) · `src/pages/contact.astro` · `src/pages/guestbook.astro` · `src/pages/api/contact.ts` · `src/pages/api/guestbook.ts` · `src/pages/api/interests.ts` · `src/lib/db.ts` (stub ก่อน implement)
+> สถานะปัจจุบัน: ข้อ Mismatch ใน §2 แก้แล้วใน Lab 05 (ดู STATUS.md) · ข้อใน §3 ยังเปิดเป็น issue #9
 
 ## 1. สรุปผลสั้น
 
-| จุดต่อ | สถานะ |
+| จุดต่อ | สถานะ (ตอนตรวจ) |
 |---|---|
 | Contact: ฟอร์ม → `POST /api/contact` | ✅ Match (payload + status code) — เหลือ BE ต้อง validate จริงใน Lab 05 |
 | Contact: พฤติกรรมเมื่อ 501/error ตาม D6 | ✅ Match |
@@ -27,17 +28,17 @@
 - **Microcopy privacy (D11):** `<p class="muted-small">ใช้ข้อมูลนี้เพื่อตอบกลับคุณเท่านั้น</p>` มีใต้ฟอร์มแล้ว
 - **D5:** อีเมลเป็นลิงก์ `mailto` ตัวลิงก์เขียนว่า "ส่งอีเมล" ทั้งใน markup และใน JS (`a.textContent = 'ส่งอีเมล'`) — ไม่พิมพ์ที่อยู่เป็นข้อความ
 
-### ❌ Mismatch
+### ❌ Mismatch (แก้แล้วใน Lab 05)
 
-1. **`err.message` หลุดออก client:** ทั้ง `contact.ts` และ `guestbook.ts` ตอบ `JSON.stringify({ error: message })` โดย `message = err.message` ของจริง (เช่น parse error ของ `request.json()`, ข้อความจาก better-sqlite3, path ของไฟล์) — ตรงกับสิ่งที่กติกาห้ามคือ "error ที่ไม่ leak stack/รายละเอียดภายใน"
-2. **400 ใช้เป็นถังขยะ error ทุกชนิด:** stub แปลง "error ใด ๆ ที่ไม่ใช่ NOT_IMPLEMENTED" เป็น 400 ทั้งที่บางอันควรเป็น 500 (DB ล้ม, table ไม่มี) — ทำให้ฟอร์มโชว์ "กรุณาตรวจชื่อ อีเมล และข้อความ" ทั้งที่ผู้ใช้กรอกถูกแล้ว = สัญญาณหลอก
-3. **ยังไม่มี validation ฝั่ง server (D11):** ฟอร์มกำหนด `maxlength` name=80 / email=120 / message=2000 และ `type="email"` แต่เป็น client-side ล้วน — stub `insertContact` รับอะไรก็ได้ (type เป็นแค่ annotation) — D11 กำหนดให้ backend "validate ความยาว" ซึ่งยังไม่มี
+1. **`err.message` หลุดออก client:** เดิม `api/contact.ts` และ `api/guestbook.ts` ตอบ `{ error: err.message }` ของจริง (เช่น parse error ของ `request.json()`, ข้อความจาก better-sqlite3, path ของไฟล์) → แก้เป็นข้อความคงที่ `{ error: "invalid" }` / `{ error: "server error" }` + log ฝั่ง server เท่านั้น
+2. **400 ใช้เป็นถังขยะ error ทุกชนิด:** เดิม error ใด ๆ ที่ไม่ใช่ NOT_IMPLEMENTED ถูกตอบ 400 ทั้งที่บางอันควรเป็น 500 (DB ล้ม, table ไม่มี) → แก้: validation fail = 400 · server fail = 500 · NOT_IMPLEMENTED = 501 (คงไว้เพราะเทส labs อ้างอิง)
+3. **ยังไม่มี validation ฝั่ง server (D11):** ฟอร์มกำหนด `maxlength` name=80 / email=120 / message=2000 และ `type="email"` แต่เป็น client-side ล้วน → implement แล้วใน `insertContact` (trim, บังคับความยาวตาม maxlength, ตรวจรูปแบบอีเมลแบบหลวม ๆ)
 
-### 💡 ข้อเสนอแนะ (Lab 05)
+### 💡 ข้อเสนอแนะ (สรุป — ทำแล้วใน Lab 05)
 
-- `insertContact` ต้อง: ตรวจว่า `body` เป็น object มีแค่ 3 คีย์ string, ตัดช่องว่าง (`trim`), บังคับความยาว name ≤ 80 / email ≤ 120 / message ≤ 2000 (ให้ตรง `maxlength` ของฟอร์ม), ตรวจรูปแบบอีเมลแบบหลวม ๆ — ไม่ผ่านโยน error ชนิด "VALIDATION" แยกจาก error ระบบ
-- ใน `api/contact.ts` แยกสถานะ: validation fail → `400 { error: "invalid" }` (ข้อความคงที่ ไม่ใช่ `err.message`) · DB/server fail → `500 { error: "server error" }` · NOT_IMPLEMENTED → `501` (คงไว้เพราะเทส labs อ้างอิง)
-- ฟอร์มฝั่ง FE เขียนรอรับ 400 และ 500 แยกกันแล้ว — BE แค่อย่าส่ง 500 มาเป็น 400 ก็ต่อกันได้ทันที **ไม่ต้องแก้ FE**
+- `insertContact`: ตรวจ body เป็น string ทั้ง 3 ช่อง, `trim`, name ≤ 80 / email ≤ 120 / message ≤ 2000 (ตรง maxlength ฟอร์ม), email format — ไม่ผ่านโยน `VALIDATION: ...` แยกจาก error ระบบ
+- `api/contact.ts` แยกสถานะ: validation fail → `400 { error: "invalid" }` · DB/server fail → `500 { error: "server error" }` · NOT_IMPLEMENTED → `501`
+- FE ไม่ต้องแก้ — ฟอร์มเขียนรอ 400 กับ 500 แยกกันอยู่แล้ว
 
 ---
 
@@ -52,23 +53,23 @@
 - **Escape output:** client escape `name` / `message` / `created_at` ด้วย `esc()` ก่อน `innerHTML` — ปิดข้อแรกของ D9 (escape output) ฝั่งแสดงผล
 - **D9 เรื่องลิงก์:** ไม่มี Guestbook ใน nav/footer (BaseLayout ยืนยันแล้ว) — หน้ายัง reachable ตามที่งาน backend ต้องใช้
 
-### ❌ Mismatch (ขัด D9 — เงื่อนไขก่อนเปิดจริง)
+### ❌ Mismatch (ขัด D9 — เงื่อนไขก่อนเปิดจริง) → เปิดเป็น issue #9
 
 | เงื่อนไข D9 | สถานะ stub ปัจจุบัน |
 |---|---|
 | escape output | ✅ ทำที่ client แล้ว (BE ก็ควร sanitize ตอน render ซ้ำถ้ามีหน้าอื่น render) |
-| rate limit | ❌ ไม่มีใน stub — POST ยิงได้ไม่อั้น |
+| rate limit | ❌ ไม่มี — POST ยิงได้ไม่อั้น |
 | honeypot | ❌ ฟอร์มไม่มีช่อง honeypot และ stub ไม่รองรับ |
-| เพดานความยาว | ⚠️ client มี maxlength (80/500) แต่ server ยังไม่ validate |
-| moderation/อนุมัติก่อนแสดง | ❌ `GET` ออกแบบให้ list **ทุกแถว** ทันทีที่ insert — ไม่มีคอลัมน์/เงื่อนไข "approved" |
-| เพดานจำนวนแถว | ❌ ไม่มี — ตารางโตได้ไม่จำกัด |
+| เพดานความยาว | ⚠️ client มี maxlength (80/500) — server validate แล้วใน Lab 05 (`insertGuestbook`) |
+| moderation/อนุมัติก่อนแสดง | ❌ `GET` list ทุกแถวทันทีที่ insert — ไม่มีคอลัมน์ "approved" |
+| เพดานจำนวนแถว | ✅ บางส่วน — `listGuestbook()` LIMIT 100 แล้ว (Lab 05) · การลบแถวเก่ายังไม่มี |
 
-### 💡 ข้อเสนอแนะ (Lab 05 — ให้ตรง D9 ก่อนเปิดใช้จริง)
+### 💡 ข้อเสนอแนะ (Later — ตาม issue #9)
 
 - เพิ่มคอลัมน์ `approved INTEGER NOT NULL DEFAULT 0` ในตาราง `guestbook` และให้ `listGuestbook()` คืนเฉพาะ `approved = 1` — สัญญา `GET` รูปทรงไม่เปลี่ยน FE ไม่ต้องแก้
-- `insertGuestbook` validate: name ≤ 80, message ≤ 500 (ตาม maxlength ฟอร์ม), trim, ปัด honeypot field ทิ้งถ้ามา (FE ยังไม่มีช่องนี้ — ให้ BE รองรับไว้ก่อนไม่ทำให้ contract แตก)
-- Rate limit อย่างง่าย (เช่นจำกัดต่อ IP/ช่วงเวลาใน SQLite เอง) + ลบแถวเก่าเกินเพดาน — เก็บเป็นหมายเหตุใน `docs/` ตาม D11 (กำหนดระยะเก็บ/วิธีลบ)
-- แก้ error handler ให้ไม่ส่ง `err.message` ออกนอก (เหมือนข้อเสนอ Contact) — `GET` ตอบ `500 { error: "server error" }` แทน message จริง
+- รองรับ honeypot field ไว้ก่อน (ปัดทิ้งถ้ามา) แม้ FE ยังไม่มีช่อง
+- Rate limit อย่างง่าย (ต่อ IP/ช่วงเวลา) + กำหนดระยะเก็บ/วิธีลบ (D11)
+- **ห้ามลิงก์ Guestbook เข้า nav/footer จนครบทุกข้อของ D9**
 
 ---
 
@@ -76,17 +77,17 @@
 
 - ไม่มีหน้า `.astro` ไหนเรียก `/api/interests` (grep ทั้ง `src/` เจอแค่ตัว endpoint เอง) — หน้า Interests อ่านผ่าน `loadProfile()` ตอน SSR อยู่แล้ว
 - **ไม่ใช่ mismatch** เพราะไม่มีใครพึ่งมัน แต่เป็น endpoint ที่ expose ข้อมูล profile โดยไม่มีผู้ใช้
-- **ข้อเสนอ:** ปล่อยไว้ได้ (ไม่มีความเสี่ยง เพราะข้อมูลเดียวกับที่หน้าเว็บโชว์อยู่แล้ว) หรือลบใน Lab 05 ถ้ายืนยันว่าไม่ใช้ — ตัดสินใจเป็น D-note ได้ ไม่เร่งด่วน
+- **ข้อเสนอ:** ปล่อยไว้ได้ (ข้อมูลเดียวกับที่หน้าเว็บโชว์อยู่แล้ว) หรือลบถ้ายืนยันว่าไม่ใช้ — ไม่เร่งด่วน
 
 ---
 
 ## 5. ข้อสังเกตความสอดคล้องกับ DECISIONS (สรุป)
 
 - **D5 / D6 / D11 (ฝั่ง FE ของ Contact):** ตรวจแล้วตรง — ฟอร์มเก็บข้อความไว้เมื่อ error, มีทางไปอีเมล, ไม่ render ที่อยู่อีเมลเป็นข้อความ, ไม่โชว์ stack trace (ใช้ข้อความคงที่เท่านั้น)
-- **D9:** หน้า Guestbook ยัง reachable และ client escape แล้ว แต่ **stub API ยังไม่ผ่านเงื่อนไข D9 อีก 4 ข้อ** (rate limit, honeypot, moderation, เพดานแถว) — สอดคล้องกับที่ D9 เลื่อนไป Later อยู่แล้ว Lab 05 ควรทำตามรายการใน §3 ก่อนพิจารณา "เปิดจริง"
-- **D11:** ข้อ "แจ้งเตือนเจ้าของเมื่อมีข้อความใหม่" และ "DATA_DIR บน volume ถาวร" เป็นงาน deploy/Lab ที่เกิน stub ปัจจุบัน — จดไว้เป็นช่องว่างของ Lab 05
+- **D9:** หน้า Guestbook ยัง reachable และ client escape แล้ว แต่ API ยังไม่ผ่านเงื่อนไข D9 ครบ — ติดตามที่ issue #9
+- **D11:** ข้อ "แจ้งเตือนเจ้าของเมื่อมีข้อความใหม่" และ "DATA_DIR บน volume ถาวร" เป็นงาน deploy (L5 → Lab 08)
 
 ## ขอบเขตที่รายงานนี้ไม่ได้แตะ
 
-- ไม่แก้ `src/lib/db.ts` / `src/pages/api/*` / หน้า `.astro` ทุกไฟล์ (ตามคำขอ)
-- ไม่แตะ UI/copy/สี — เห็นว่า FE ทำครบตาม D5/D6/D11 ฝั่งตัวเองแล้ว
+- ไม่แก้หน้า `.astro` ทุกไฟล์ (UI/copy/สี เป็นของ frontend)
+- ส่วน `src/lib/db.ts` / `src/pages/api/*` implement แล้วใน Lab 05 ตามข้อเสนอในรายงานนี้

@@ -39,7 +39,8 @@ const FALLBACK: Profile = {
   bio: 'This personal site is still being built — content is coming soon.',
   bioParagraphs: ['This personal site is still being built — content is coming soon.'],
   audience: 'Hiring managers / peers / community',
-  interests: ['AI agents', 'Web', 'Teaching'],
+  // Empty (not template topics) so an empty section renders nothing (D8 · review S4).
+  interests: [],
   skills: [],
   contact: {},
 };
@@ -79,13 +80,23 @@ const paragraphs = (text: string) =>
   text
     .split(/\n\s*\n/)
     .map((p) => p.trim())
-    .filter(Boolean);
+    .filter((p) => p && !isPlaceholder(p));
+
+/** Contact values become hrefs — only allow plain addresses / http(s) URLs (review S2). */
+const SAFE_CONTACT: Record<keyof Contact, RegExp> = {
+  email: /^[^\s@:/]+@[^\s@:/]+\.[^\s@:/]+$/,
+  github: /^https?:\/\/\S+$/i,
+  linkedin: /^https?:\/\/\S+$/i,
+};
 
 function parseContact(text: string): Contact {
   const contact: Contact = {};
   for (const item of bullets(text)) {
     const m = item.match(/^(email|github|linkedin)\s*:\s*(.*)$/i);
-    if (m && !isPlaceholder(m[2])) contact[m[1].toLowerCase() as keyof Contact] = m[2].trim();
+    if (!m) continue;
+    const key = m[1].toLowerCase() as keyof Contact;
+    const value = m[2].trim();
+    if (!isPlaceholder(value) && SAFE_CONTACT[key].test(value)) contact[key] = value;
   }
   return contact;
 }

@@ -8,7 +8,7 @@ Updated by: Claude Code
 
 ## Current goal
 
-- Lab 07 cross-model review: ตอบ `docs/review-opencode.md` (PR #7) → merge PR #10 (backend) ก่อน แล้ว PR #7 (frontend) ตาม M1
+- Lab 07 cross-model review ตอบครบแล้ว (`docs/review-claude-rebuttal.md`) · เหลือ merge PR #10 → PR #7 (ต้องให้เจ้าของ repo กด merge)
 
 ## Done
 
@@ -20,10 +20,11 @@ Updated by: Claude Code
 - Lab 05 (OpenCode · PR #10): `insertContact` / `insertGuestbook` / `listGuestbook` + validation (D11) · API แยก 400/500/501 ด้วยข้อความคงที่ · `test:labs` เขียว
 - Lab 05b swarm: `docs/SWARM.md` (4/20 turns · done ครบ)
 - Lab 06 E2E (Claude): `docs/QA.md` ## E2E Playwright ผ่าน Playwright MCP — ทุก step ผ่าน · a11y debate + action items A11Y-1..9
+- Lab 07 (Claude): ตอบ `docs/review-opencode.md` — M1 ✅ (merge `lab-05-backend` เข้า `lab-04-frontend` + resolve conflict) · S1–S4 ✅ · N1/N3/N4 ✅ · N2 คงไว้พร้อมเหตุผล · เพิ่ม A11Y-1 (ขอบ input 3.37:1) + เทส frontmatter กันคำว่า course · `npm test` 14/14 · `test:labs` 2/2 · build ผ่าน
 
 ## In progress
 
-- Lab 07: ดู `docs/review-claude-rebuttal.md`
+- —
 
 ## Blocked
 
@@ -31,7 +32,16 @@ Updated by: Claude Code
 
 ## Next actions
 
-1. merge PR #10 → แล้ว PR #7 (branch `lab-04-frontend` merge `lab-05-backend` ไว้แล้ว — ไม่มี conflict ค้าง)
+1. เจ้าของ repo merge PR #10 → แล้ว PR #7 (#7 รวม #10 ไว้แล้ว ไม่มี conflict) · ปิด issue #8 / #1–#5 ตามที่อ้าง
+2. วางสรุป round-trip จาก `docs/review-claude-rebuttal.md` บน PR #7
+3. ก่อน ship: L9 (guestbook route / moderation) · L5 (DATA_DIR + DB ใหม่)
+
+## Files changed in latest session
+
+- `src/lib/profile.ts` · `src/pages/interests.astro` · `src/pages/guestbook.astro` · `src/layouts/BaseLayout.astro`
+- `tests/profile.test.ts` · `tests/public-site.test.ts`
+- `docs/review-opencode.md` (commit ไฟล์ของ OpenCode ตามเดิม) · `docs/review-claude-rebuttal.md` · `docs/QA.md` · `docs/STATUS.md` · `docs/OPEN_LOOPS.md`
+- `.gitignore` (`.playwright-mcp/`, `docs/_pr-diff-*.txt`)
 
 ## Notes
 

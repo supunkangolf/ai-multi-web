@@ -20,12 +20,14 @@ const profile = loadProfile();
     </section>
   )}
 
-  <section aria-labelledby="interests-h">
-    <h2 id="interests-h">ความสนใจ</h2>
-    <ul class="grid cards">
-      {profile.interests.map((item) => <li class="card">{item}</li>)}
-    </ul>
-  </section>
+  {profile.interests.length > 0 && (
+    <section aria-labelledby="interests-h">
+      <h2 id="interests-h">ความสนใจ</h2>
+      <ul class="grid cards">
+        {profile.interests.map((item) => <li class="card">{item}</li>)}
+      </ul>
+    </section>
+  )}
 </BaseLayout>
 
 <style>

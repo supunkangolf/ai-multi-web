@@ -6,13 +6,15 @@
  */
 export const prerender = false;
 import BaseLayout from '../layouts/BaseLayout.astro';
+import { loadProfile } from '../lib/profile';
+const profile = loadProfile();
 ---
-<BaseLayout title="สมุดเยี่ยม">
+<BaseLayout title={`สมุดเยี่ยม · ${profile.name}`} description={profile.headline}>
   <section class="card">
     <h1>สมุดเยี่ยม</h1>
     <form id="gb-form">
       <label for="name">ชื่อ (Name)</label>
-      <input id="name" name="name" required maxlength="80" />
+      <input id="name" name="name" required maxlength="80" autocomplete="name" />
       <label for="message">ข้อความ (Message)</label>
       <textarea id="message" name="message" rows="3" required maxlength="500"></textarea>
       <p><button type="submit">ลงชื่อ</button></p>
@@ -52,6 +54,10 @@ import BaseLayout from '../layouts/BaseLayout.astro';
         headers: { 'content-type': 'application/json' },
         body: JSON.stringify(payload),
       });
+      if (res.status === 400) {
+        if (status) status.textContent = 'กรุณาตรวจชื่อและข้อความ (ชื่อไม่เกิน 80 · ข้อความไม่เกิน 500 ตัวอักษร)';
+        return;
+      }
       if (!res.ok) { if (status) status.textContent = NOT_READY + ' — ข้อความของคุณยังอยู่ในช่อง'; return; }
       form.reset();
       if (status) status.textContent = 'ขอบคุณครับ';

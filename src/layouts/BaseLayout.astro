@@ -103,6 +103,8 @@ const year = new Date().getFullYear();
         font: inherit; border-radius: 10px; border: 1px solid var(--border);
         background: #fff; color: var(--text); padding: 0.7rem 0.9rem; width: 100%;
       }
+      /* Field boundary ≥ 3:1 on white (WCAG 1.4.11 · QA A11Y-1); --border is 1.32:1. */
+      input, textarea { border-color: #8589b3; }
       button {
         background: var(--accent); color: #fff; font-weight: 700; cursor: pointer;
         width: auto; border-color: var(--accent);

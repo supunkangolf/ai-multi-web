@@ -65,6 +65,21 @@ describe('parseProfile', () => {
     expect(q.headline).toBe('Hello');
   });
 
+  it('drops contact links with unsafe schemes (S2)', () => {
+    const q = parseProfile(
+      '## Contact\n- email: javascript:alert(1)\n- github: javascript:alert(1)\n- linkedin: http://linkedin.com/in/jane\n',
+    );
+    expect(q.contact).toEqual({ linkedin: 'http://linkedin.com/in/jane' });
+  });
+
+  it('returns no interests instead of template fallback when the section is empty (S4)', () => {
+    expect(parseProfile('## Name\nJane\n').interests).toEqual([]);
+  });
+
+  it('skips placeholder Bio paragraphs (N3)', () => {
+    expect(parseProfile('## Bio\nReal.\n\n—\n').bioParagraphs).toEqual(['Real.']);
+  });
+
   it('handles CRLF line endings', () => {
     const q = parseProfile(SAMPLE.replace(/\n/g, '\r\n'));
     expect(q.interests).toHaveLength(4);
@@ -75,8 +90,10 @@ describe('parseProfile', () => {
 describe('loadProfile (real docs/PROFILE.md)', () => {
   it('does not fall back when PROFILE has content', () => {
     const p = loadProfile();
-    expect(p.name).not.toBe('Your Name');
-    expect(p.bioParagraphs.length).toBeGreaterThan(1);
-    expect(p.interests.length).toBeGreaterThan(1);
+    // S3: assert "not fallback", not a paragraph count the owner may legitimately change.
+    const fallback = parseProfile('');
+    expect(p.name).not.toBe(fallback.name);
+    expect(p.bioParagraphs.length).toBeGreaterThan(0);
+    expect(p.bioParagraphs).not.toEqual(fallback.bioParagraphs);
   });
 });

@@ -46,24 +46,81 @@ export function getDb(): Database.Database {
   return db;
 }
 
-/** Stub: Lab 05 must implement validation + insert. */
-export function insertContact(_input: {
+/**
+ * Validate a required trimmed string field (DECISIONS D11: validate ความยาว).
+ * Throws Error('VALIDATION: ...') — API routes map this to 400 with a fixed message.
+ */
+function requireString(
+  value: unknown,
+  field: string,
+  max: number,
+): string {
+  if (typeof value !== 'string') {
+    throw new Error(`VALIDATION: ${field} must be a string`);
+  }
+  const trimmed = value.trim();
+  if (trimmed.length === 0) {
+    throw new Error(`VALIDATION: ${field} must not be empty`);
+  }
+  if (trimmed.length > max) {
+    throw new Error(`VALIDATION: ${field} exceeds ${max} characters`);
+  }
+  return trimmed;
+}
+
+const EMAIL_RE = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
+
+/** Limits mirror the client form maxlengths (contact.astro / guestbook.astro). */
+const LIMITS = {
+  contact: { name: 80, email: 120, message: 2000 },
+  guestbook: { name: 80, message: 500 },
+} as const;
+
+/** Cap on rows returned by listGuestbook (DECISIONS D9 — เพดานจำนวนแถว). */
+const GUESTBOOK_LIST_LIMIT = 100;
+
+export function insertContact(input: {
   name: string;
   email: string;
   message: string;
 }): ContactMessage {
-  throw new Error('NOT_IMPLEMENTED: insertContact — Lab 05 OpenCode');
+  const name = requireString(input?.name, 'name', LIMITS.contact.name);
+  const email = requireString(input?.email, 'email', LIMITS.contact.email);
+  const message = requireString(input?.message, 'message', LIMITS.contact.message);
+  if (!EMAIL_RE.test(email)) {
+    throw new Error('VALIDATION: email is not a valid address');
+  }
+  const db = getDb();
+  const info = db
+    .prepare('INSERT INTO contact_messages (name, email, message) VALUES (?, ?, ?)')
+    .run(name, email, message);
+  const row = db
+    .prepare('SELECT id, name, email, message, created_at FROM contact_messages WHERE id = ?')
+    .get(info.lastInsertRowid) as ContactMessage;
+  return row;
 }
 
-/** Stub: Lab 05 must implement. */
 export function listGuestbook(): GuestbookEntry[] {
-  throw new Error('NOT_IMPLEMENTED: listGuestbook — Lab 05 OpenCode');
+  const db = getDb();
+  return db
+    .prepare(
+      `SELECT id, name, message, created_at FROM guestbook ORDER BY id DESC LIMIT ${GUESTBOOK_LIST_LIMIT}`,
+    )
+    .all() as GuestbookEntry[];
 }
 
-/** Stub: Lab 05 must implement. */
-export function insertGuestbook(_input: {
+export function insertGuestbook(input: {
   name: string;
   message: string;
 }): GuestbookEntry {
-  throw new Error('NOT_IMPLEMENTED: insertGuestbook — Lab 05 OpenCode');
+  const name = requireString(input?.name, 'name', LIMITS.guestbook.name);
+  const message = requireString(input?.message, 'message', LIMITS.guestbook.message);
+  const db = getDb();
+  const info = db
+    .prepare('INSERT INTO guestbook (name, message) VALUES (?, ?)')
+    .run(name, message);
+  const row = db
+    .prepare('SELECT id, name, message, created_at FROM guestbook WHERE id = ?')
+    .get(info.lastInsertRowid) as GuestbookEntry;
+  return row;
 }

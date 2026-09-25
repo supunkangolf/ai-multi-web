@@ -1,22 +1,37 @@
 ---
+/**
+ * Home — DECISIONS D1 (headline), D2 (tagline), D3 (HR first), D4 (hero + 2 CTAs above the fold).
+ * Full bio lives on About; no audience list, no Guestbook card (D3, D9).
+ */
 export const prerender = false;
 import BaseLayout from '../layouts/BaseLayout.astro';
 import { loadProfile } from '../lib/profile';
 const profile = loadProfile();
+const github = profile.contact.github;
 ---
-<BaseLayout title={`${profile.name} · Home`} description={profile.headline}>
-  <section class="card">
-    <p style="margin:0;color:var(--accent);font-weight:700">Personal branding site</p>
-    <h1>{profile.name}</h1>
-    <p style="font-size:1.2rem;color:var(--text)">{profile.headline}</p>
-    <p>{profile.bio}</p>
-    <p><strong>Audience:</strong> {profile.audience}</p>
+<BaseLayout title={profile.name} description={profile.headline}>
+  <section class="card hero">
+    <p class="eyebrow">{profile.name}</p>
+    <h1>{profile.headline}</h1>
+    {profile.tagline && <p class="tagline">{profile.tagline}</p>}
+    <div class="actions">
+      <a class="btn btn-primary" href="/contact">ติดต่อผม</a>
+      {github && (
+        <a class="btn btn-secondary" href={github} rel="noopener noreferrer" target="_blank">ดู GitHub</a>
+      )}
+    </div>
   </section>
-  <section class="grid">
-    <a class="card" href="/about"><h2>About</h2><p>เรื่องราวและเส้นทาง</p></a>
-    <a class="card" href="/interests"><h2>Interests</h2><p>หัวข้อที่สนใจ</p></a>
-    <a class="card" href="/contact"><h2>Contact</h2><p>ส่งข้อความถึงฉัน</p></a>
-    <a class="card" href="/guestbook"><h2>Guestbook</h2><p>ฝากคำทักทาย</p></a>
+  <section class="grid" aria-label="หน้าอื่น ๆ">
+    <a class="card link-card" href="/about"><h2>เกี่ยวกับผม</h2><p>ประสบการณ์และวิธีทำงาน</p></a>
+    <a class="card link-card" href="/interests"><h2>ทักษะและความสนใจ</h2><p>เรื่องที่ผมทำและสนใจ</p></a>
   </section>
 </BaseLayout>
 
+<style>
+  .hero { padding: 1.75rem 1.5rem; border-top: 4px solid var(--php); }
+  .tagline { color: var(--text); font-size: 1.05rem; margin: 0; }
+  .link-card { text-decoration: none; display: block; }
+  .link-card:hover { border-color: var(--php); }
+  .link-card h2 { font-size: 1.15rem; margin: 0 0 0.25rem; color: var(--accent-strong); }
+  .link-card p { margin: 0; }
+</style>

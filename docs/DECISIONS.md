@@ -61,3 +61,13 @@
 3. **Contact ตาม D5 + D6:** ลิงก์ "ส่งอีเมล" ให้เห็นเสมอ ไม่มีที่อยู่อีเมลเป็นข้อความใน markup · ช่อง `—` ไม่ render · เมื่อได้ 501 ข้อความยังอยู่ในช่อง และมีข้อความสั้นพร้อมทางไปอีเมล · มี microcopy privacy (D11)
 4. **ไม่มีหัวข้อหรือช่องว่างเปล่า:** ถ้ายังไม่มี Skills หรือบรรทัดอธิบาย Interests ก็ไม่ render ส่วนนั้น (D7, D10)
 5. **`npm test` เขียว** (รวม `tests/public-site.test.ts` คือไม่มีคำว่าคอร์สหรือแล็บใน markup) · ไม่แตะ `src/lib/db.ts` / `src/pages/api/**`
+
+## GitHub issues (Lab 03)
+
+| Issue # | Title | มาจาก Decision |
+|---|---|---|
+| [#1](https://github.com/supunkangolf/ai-multi-web/issues/1) | [D1][D4] Home hero + IA เมนู 4 รายการ | D1, D4 (+D9 ไม่มี Guestbook) |
+| [#2](https://github.com/supunkangolf/ai-multi-web/issues/2) | [D2] Tagline + โทน Bio — ยืนยันการ render ตาม PROFILE ที่แก้แล้ว | D2 (+D12, D13) |
+| [#3](https://github.com/supunkangolf/ai-multi-web/issues/3) | [D3] Audience — HR หลัก · ลูกค้ารอง · ไม่เขียนถึง Dev/มือใหม่บน Home | D3 |
+| [#4](https://github.com/supunkangolf/ai-multi-web/issues/4) | [D5] ช่องทางติดต่อ — mailto "ส่งอีเมล" · ไม่ render ช่องว่าง | D5 |
+| [#5](https://github.com/supunkangolf/ai-multi-web/issues/5) | [D6] ฟอร์ม Contact ขณะ API ตอบ 501 — ไม่ล้างข้อความ + ทางไปอีเมล | D6 (+D11 microcopy) |

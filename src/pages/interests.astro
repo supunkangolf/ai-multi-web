@@ -1,16 +1,40 @@
 ---
+/**
+ * Skills & Interests — DECISIONS D7 (all interest bullets, name-only cards until owner adds
+ * a "what I do with it" line) and D10 (Skills section only when PROFILE has `## Skills`).
+ */
 export const prerender = false;
 import BaseLayout from '../layouts/BaseLayout.astro';
 import { loadProfile } from '../lib/profile';
 const profile = loadProfile();
 ---
-<BaseLayout title={`Interests · ${profile.name}`}>
-  <section class="card">
-    <h1>Interests</h1>
-    <ul>
-      {profile.interests.map((item) => <li>{item}</li>)}
-    </ul>
-    <p>อัปเดตรายการสิ่งที่สนใจเร็ว ๆ นี้</p>
-  </section>
+<BaseLayout title={`ทักษะและความสนใจ · ${profile.name}`} description={profile.headline}>
+  <h1>ทักษะและความสนใจ</h1>
+
+  {profile.skills.length > 0 && (
+    <section aria-labelledby="skills-h">
+      <h2 id="skills-h">ทักษะ</h2>
+      <ul class="grid cards">
+        {profile.skills.map((item) => <li class="card">{item}</li>)}
+      </ul>
+    </section>
+  )}
+
+  {profile.interests.length > 0 && (
+    <section aria-labelledby="interests-h">
+      <h2 id="interests-h">ความสนใจ</h2>
+      <ul class="grid cards">
+        {profile.interests.map((item) => <li class="card">{item}</li>)}
+      </ul>
+    </section>
+  )}
 </BaseLayout>
 
+<style>
+  .cards { list-style: none; padding: 0; margin: 0; }
+  .cards .card {
+    margin: 0; color: var(--text); font-weight: 600;
+    border-left: 4px solid var(--php);
+  }
+  h2 { font-size: 1.2rem; margin: 1.5rem 0 0.75rem; }
+</style>

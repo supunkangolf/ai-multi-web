@@ -1,46 +1,70 @@
 ---
+/**
+ * Guestbook — deferred to Later (DECISIONS D9): not linked from nav/footer.
+ * Page kept reachable for backend work; client output is escaped and errors are
+ * shown as a short message (no raw error text / stack traces).
+ */
 export const prerender = false;
 import BaseLayout from '../layouts/BaseLayout.astro';
+import { loadProfile } from '../lib/profile';
+const profile = loadProfile();
 ---
-<BaseLayout title="Guestbook">
+<BaseLayout title={`สมุดเยี่ยม · ${profile.name}`} description={profile.headline}>
   <section class="card">
-    <h1>Guestbook</h1>
-    <p>ฝากข้อความไว้ได้ทางฟอร์มนี้ — อ่าน/เขียนผ่าน <code>/api/guestbook</code></p>
+    <h1>สมุดเยี่ยม</h1>
     <form id="gb-form">
-      <label for="name">Name</label>
-      <input id="name" name="name" required maxlength="80" />
-      <label for="message">Message</label>
+      <label for="name">ชื่อ (Name)</label>
+      <input id="name" name="name" required maxlength="80" autocomplete="name" />
+      <label for="message">ข้อความ (Message)</label>
       <textarea id="message" name="message" rows="3" required maxlength="500"></textarea>
-      <p style="margin-top:1rem"><button type="submit">Sign</button></p>
+      <p><button type="submit">ลงชื่อ</button></p>
+      <p id="gb-status" role="status" aria-live="polite"></p>
     </form>
-    <div id="entries" class="card" style="margin-top:1.25rem" aria-live="polite">Loading…</div>
+    <div id="entries" aria-live="polite">กำลังโหลด…</div>
   </section>
 </BaseLayout>
 <script>
   const entries = document.getElementById('entries');
-  const form = document.getElementById('gb-form');
+  const form = document.getElementById('gb-form') as HTMLFormElement | null;
+  const status = document.getElementById('gb-status');
+  const NOT_READY = 'สมุดเยี่ยมยังไม่เปิดใช้งาน';
+  const esc = (v: unknown) =>
+    String(v ?? '').replace(/[&<>"']/g, (c) => ({ '&': '&amp;', '<': '&lt;', '>': '&gt;', '"': '&quot;', "'": '&#39;' })[c] as string);
+
   async function load() {
-    const res = await fetch('/api/guestbook');
-    const data = await res.json();
-    if (!res.ok) {
-      entries.textContent = data.error || `HTTP ${res.status}`;
-      return;
+    if (!entries) return;
+    try {
+      const res = await fetch('/api/guestbook');
+      if (!res.ok) { entries.textContent = NOT_READY; return; }
+      const data = await res.json();
+      const list = Array.isArray(data.entries) ? data.entries : [];
+      entries.innerHTML = list.length
+        ? list.map((e: any) => `<p><strong>${esc(e.name)}</strong>: ${esc(e.message)}<br/><small>${esc(e.created_at)}</small></p>`).join('')
+        : '<p>ยังไม่มีข้อความ</p>';
+    } catch {
+      entries.textContent = NOT_READY;
     }
-    entries.innerHTML = (data.entries || [])
-      .map((e) => `<p><strong>${e.name}</strong>: ${e.message}<br/><small>${e.created_at}</small></p>`)
-      .join('') || '<p>No entries yet.</p>';
   }
   form?.addEventListener('submit', async (e) => {
     e.preventDefault();
     const payload = Object.fromEntries(new FormData(form).entries());
-    await fetch('/api/guestbook', {
-      method: 'POST',
-      headers: { 'content-type': 'application/json' },
-      body: JSON.stringify(payload),
-    });
-    form.reset();
-    await load();
+    try {
+      const res = await fetch('/api/guestbook', {
+        method: 'POST',
+        headers: { 'content-type': 'application/json' },
+        body: JSON.stringify(payload),
+      });
+      if (res.status === 400) {
+        if (status) status.textContent = 'กรุณาตรวจชื่อและข้อความ (ชื่อไม่เกิน 80 · ข้อความไม่เกิน 500 ตัวอักษร)';
+        return;
+      }
+      if (!res.ok) { if (status) status.textContent = NOT_READY + ' — ข้อความของคุณยังอยู่ในช่อง'; return; }
+      form.reset();
+      if (status) status.textContent = 'ขอบคุณครับ';
+      await load();
+    } catch {
+      if (status) status.textContent = NOT_READY + ' — ข้อความของคุณยังอยู่ในช่อง';
+    }
   });
   load();
 </script>
-

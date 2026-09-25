@@ -22,7 +22,7 @@
 | 9 | Console errors | ✅ เฉพาะที่คาด | มีแค่ 404 (step 5) และ 400 (step 7) ที่ตั้งใจยิง · ไม่มี JS error |
 | 10 | Screenshot (full page) | ✅ | [`mcp-home`](screenshots/mcp-home.png) · [`mcp-about`](screenshots/mcp-about.png) · [`mcp-contact-submitted`](screenshots/mcp-contact-submitted.png) · [`mcp-guestbook`](screenshots/mcp-guestbook.png) |
 
-### Findings (ยังไม่แก้ — รอสั่งหลัง a11y)
+### Findings (วัดบน `main` template — สถานะล่าสุดดู "สถานะหลัง PR #7" ท้ายไฟล์)
 
 | ID | ระดับ | เรื่อง | อ้างอิง |
 |---|---|---|---|
@@ -98,3 +98,26 @@
 | A11Y-9 | P2 | Skip link "ข้ามไปเนื้อหา" · ตัวบ่งชี้ช่องบังคับ · แปล label/heading เป็นไทยให้ตรง `lang="th"` (ทำพร้อม Lab 04 / QA-3) | 20 นาที | `BaseLayout.astro` · pages | Claude (frontend) | Tab แรกเจอ skip link |
 
 P0 + P1 (A11Y-1..6) รวม ≈ 30 นาที · ไม่ต้องแตะ API
+
+## สถานะหลัง PR #7 (Lab 07 · review N4)
+
+> ตรวจบน branch `lab-04-frontend` หลัง merge `lab-05-backend` · 2026-09-25 · Claude Code · ยืนยันผ่าน Playwright MCP + `npm test` 14/14 · `test:labs` 2/2 · build ผ่าน
+
+| ID | สถานะ | หลักฐาน |
+|---|---|---|
+| QA-1 | ✅ แก้แล้ว (PR #7) | `guestbook.astro` `esc()` ก่อน `innerHTML` |
+| QA-2 | ✅ แก้แล้ว (PR #7) | nav 4 รายการ ไม่มี Guestbook · ไม่มีการ์ด Guestbook บน Home (D9) |
+| QA-3 | ✅ แก้แล้ว (PR #7) | `h1` ภาษาไทยทุกหน้า |
+| QA-4 | ✅ แก้แล้ว (PR #7) | `#gb-status` `role="status"` · 400 แยกข้อความแล้ว (review S1) |
+| QA-5 | ✅ แก้แล้ว (PR #7) | ไม่มีข้อความ `/api/...` ใน markup |
+| QA-6 | ✅ แก้แล้ว | ทุกหน้า `<title>` = "<หน้า> · ชื่อ" (Guestbook แก้ในรอบ Lab 07) |
+| QA-7 | ◐ บางส่วน | timestamp แยกบรรทัดด้วย `<small>` แล้ว · ข้อมูล demo ใน SQLite local → ใช้ DB ใหม่ตอน deploy (OPEN_LOOPS L5) |
+| A11Y-1 | ✅ แก้แล้ว (Lab 07) | ธีมใหม่ `--border` 1.32:1 → input/textarea `#8589b3` = 3.37:1 บนขาว |
+| A11Y-2 | ✅ แก้แล้ว (PR #7) | `:focus-visible` 3px `--php` = 3.98:1 บนขาว |
+| A11Y-3 | ✅ แก้แล้ว | default description = Headline (PR #7) + เทสใหม่ scan string ใน frontmatter (RED เมื่อใส่ข้อความเดิมกลับ) |
+| A11Y-4 | ✅ แก้แล้ว | `autocomplete` name/email (Contact · PR #7) + name (Guestbook · Lab 07) |
+| A11Y-5 | ✅ แก้แล้ว (PR #7) | error ภาษาไทยบอกวิธีแก้ + เก็บข้อความในช่อง |
+| A11Y-6 | ✅ แก้แล้ว | = QA-6 |
+| A11Y-7 | ✅ แก้แล้ว (PR #7) | escape + live region (Guestbook ยังไม่เปิดตาม D9) |
+| A11Y-8 | ⏳ follow-up | ต้องให้ API คืน field ที่ผิด — OpenCode (backend) |
+| A11Y-9 | ⏳ follow-up | skip link ยังไม่มี · label/heading เป็นไทยแล้ว |

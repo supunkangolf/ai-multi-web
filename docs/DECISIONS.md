@@ -71,3 +71,11 @@
 | [#3](https://github.com/supunkangolf/ai-multi-web/issues/3) | [D3] Audience — HR หลัก · ลูกค้ารอง · ไม่เขียนถึง Dev/มือใหม่บน Home | D3 |
 | [#4](https://github.com/supunkangolf/ai-multi-web/issues/4) | [D5] ช่องทางติดต่อ — mailto "ส่งอีเมล" · ไม่ render ช่องว่าง | D5 |
 | [#5](https://github.com/supunkangolf/ai-multi-web/issues/5) | [D6] ฟอร์ม Contact ขณะ API ตอบ 501 — ไม่ล้างข้อความ + ทางไปอีเมล | D6 (+D11 microcopy) |
+
+## Lab 03 — MCP vs gh
+
+- **ความเร็ว:** MCP สร้างได้หลาย issue ในรอบเดียว (#1–#5 ส่งพร้อมกัน) และ agent ร่าง body ให้จาก DECISIONS ได้เลย · `gh` ต้องพิมพ์หรือเตรียม body ทีละอัน แต่เร็วกว่าถ้ามีอันเดียวและรู้ว่าจะเขียนอะไร เพราะไม่ต้องผ่าน agent
+- **สิทธิ์:** MCP ใช้ PAT ที่ตั้งไว้ใน config ของ MCP server (สิทธิ์ตาม scope ของ token นั้น) · `gh` ใช้ token จาก `gh auth login` ของเครื่อง · เป็นคนละ credential กัน ถ้าตัวหนึ่งใช้ได้ ไม่ได้แปลว่าอีกตัวจะใช้ได้ด้วย · เก็บ token นอก repo เสมอ
+- **Audit trail:** บน GitHub ทั้งสองแบบบันทึกผู้สร้างเป็น user เดียวกัน (`supunkangolf`) · ฝั่งเครื่อง MCP มี tool call + URL ที่ได้กลับมาอยู่ในทรานสคริปต์ของ agent · `gh` มีเฉพาะ shell history · ทางที่ตรวจย้อนได้ดีที่สุดคือตาราง issue ↔ D-id ในไฟล์นี้
+- **ข้อผิดพลาดที่เจอ:** MCP ไม่เจอ 401 (`get_me` ผ่านก่อนสร้าง) · label `docs` ไม่มีใน repo เลยใช้ `documentation` แทน · GitHub ไม่มีสถานะ "draft" สำหรับ issue ต้องใช้ `gh issue create --web` เพื่อตรวจก่อนกดสร้างเอง · ฝั่ง `gh` ให้บันทึกผลเพิ่มหลังรันจริง
+- **เมื่อไหร่ใช้อะไร:** MCP ใช้กับงานหลายชิ้นที่ต้องแปลงจากเอกสาร ให้ agent ร่างและตรวจของที่มีอยู่ก่อน (search/list กัน issue ซ้ำ) · `gh` ใช้กับงานเดี่ยวที่คนต้องการคุมเอง, ใช้ใน script/CI หรือเมื่อ MCP ใช้ไม่ได้ (401 หรือ server ไม่ขึ้น) · MCP ใช้กับงานผลิตเท่านั้น ไม่ใช่ท่อระหว่าง Claude กับ OpenCode

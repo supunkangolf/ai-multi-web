@@ -1,0 +1,22 @@
+- generic [active] [ref=f1e1]:
+  - navigation "หลัก" [ref=f1e2]:
+    - link "Home" [ref=f1e3] [cursor=pointer]:
+      - /url: /
+    - link "About" [ref=f1e4] [cursor=pointer]:
+      - /url: /about
+    - link "Interests" [ref=f1e5] [cursor=pointer]:
+      - /url: /interests
+    - link "Contact" [ref=f1e6] [cursor=pointer]:
+      - /url: /contact
+    - link "Guestbook" [ref=f1e7] [cursor=pointer]:
+      - /url: /guestbook
+  - main [ref=f1e8]:
+    - article [ref=f1e9]:
+      - heading "About" [level=1] [ref=f1e10]
+      - paragraph [ref=f1e11]: สวัสดีครับ ผม Supunkan Keawmeesri เป็น PHP Developer ที่ทำเว็บให้บริษัทมาแล้วกว่า 5 ปี ชอบเปลี่ยนความต้องการทางธุรกิจให้กลายเป็นเว็บที่ใช้งานได้จริงและดูแลต่อได้ง่าย
+      - paragraph [ref=f1e12]: เรื่องราวเพิ่มเติม — timeline, skills และลิงก์จะอัปเดตเร็ว ๆ นี้
+  - generic [ref=f1e15]:
+    - button [ref=f1e16]
+    - button [ref=f1e22]
+    - button [ref=f1e26]
+    - button [ref=f1e31]

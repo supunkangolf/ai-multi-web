@@ -4,7 +4,7 @@
 > ดู [`COURSE.md`](../COURSE.md) ชั้น State (Hot)
 
 Last updated: 2026-09-25 +07:00  
-Updated by: OpenCode
+Updated by: Claude Code
 
 ## Current goal
 
@@ -16,6 +16,7 @@ Updated by: OpenCode
 - Lab 01: สัมภาษณ์ 9 ข้อแล้ว และเขียน `docs/PROFILE.md` ภาษาไทยเสร็จ
 - Lab 02 (รอบใหม่ 2026-09-25): ไฟล์ DEBATE/DECISIONS เดิมว่าง 0 byte ทั้งที่ STATUS บอกว่าเสร็จ → รันใหม่ด้วย Subagents 3 บทบาท × 2 รอบ · `docs/DEBATE.md` ครบ 3 หัวข้อ + ตารางจุดขัดแย้ง · `docs/DECISIONS.md` D1–D14 (เลขเดิม D5/D9/D10/D11 ตรงกับ OPEN_LOOPS) · PROFILE: Tagline + Bio ย่อหน้า 3–4 (D2) · Headline คงเดิม (D1)
 - Lab 05 (OpenCode): implement `insertContact` / `insertGuestbook` / `listGuestbook` ใน `src/lib/db.ts` + validation ตาม D11 (ความยาวตาม maxlength ฟอร์ม, email format) · `api/contact.ts` + `api/guestbook.ts`: แยก 400 (validation) / 500 (server) / 501 และ error body เป็นข้อความคงที่ไม่ leak `err.message` · `npm run test:labs` 2/2 เขียว · `npm test` เขียว · `npm run build` ผ่าน
+- Lab 06 E2E (Claude): `docs/QA.md` ## E2E Playwright — รันซ้ำผ่าน **Playwright MCP** แล้ว ทุก step ผ่าน (Home/About/Interests/Contact 200 · contact 201 · invalid 400 · guestbook 201 · control 404) · screenshots `docs/screenshots/mcp-*.png` · findings QA-1..7 ยังไม่แก้ (รอหลัง a11y)
 
 ## In progress
 
